@@ -12,7 +12,7 @@ import OnboardingScreens from "./src/screens/Splash/Onboard";
 //  import permission APIs for modules you use
 import * as Audio from 'expo-av';
 import { Camera } from 'expo-camera';
-// import * as MediaLibrary from 'expo-media-library';
+import * as MediaLibrary from 'expo-media-library';
 
 // Prevent the splash screen from auto-hiding
 SplashScreenExpo.preventAutoHideAsync().then(() => {});

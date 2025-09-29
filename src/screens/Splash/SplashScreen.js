@@ -149,7 +149,7 @@ export default function SplashScreen({ navigation }) {
                 >
                     <View style={css.iconWrapper}>
                         <Image
-                            source={require('../../assets/splash.png')}
+                            source={require('../../../assets/splash.png')}
                             style={css.appIcon}
                         />
                         {/* Voice wave indicator */}
