@@ -41,7 +41,7 @@ export default function LoginScreen({ navigation }) {
 
         setTimeout(() => {
             setIsLoading(false);
-            if(formData.phone === "0961538892" || (formData.email.trim().toLowerCase() ==="silas@chalwe.com") && (formData.password==="1234"))
+            if(formData.phone === "0" || (formData.email.trim().toLowerCase() ==="test@123.com") && (formData.password==="1234"))
             {
                 Alert.alert('Success', 'Login successful!', [
                     {
