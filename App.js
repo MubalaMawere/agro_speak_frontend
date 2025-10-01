@@ -6,6 +6,7 @@ import SplashScreen from './src/screens/Splash/SplashScreen';
 import LoginScreen from './src/screens/Auth/LoginScreen';
 import RegisterScreen from './src/screens/Auth/RegisterScreen';
 import HomeScreen from './src/screens/Home/HomeScreen';
+import WeatherTestScreen from './src/screens/WeatherTestScreen';
 import * as SplashScreenExpo from 'expo-splash-screen';
 import OnboardingScreens from "./src/screens/Splash/Onboard";
 
@@ -68,6 +69,7 @@ export default function App() {
                 <Stack.Screen name="Login" component={LoginScreen} options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen name="Register" component={RegisterScreen} options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen name="Home" component={HomeScreen} options={{ animation: 'fade' }} />
+                <Stack.Screen name="WeatherTest" component={WeatherTestScreen} options={{ animation: 'slide_from_right' }} />
             </Stack.Navigator>
         </NavigationContainer>
     );

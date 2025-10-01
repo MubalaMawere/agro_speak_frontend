@@ -14,10 +14,16 @@ import {
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { css } from './AdaptiveAuthStyles';
+import { getApiUrl, API_ENDPOINTS } from '../../config/api';
+import { handleApiError } from '../../utils/errorHandler';
 
 export default function RegisterScreen({ navigation }) {
-    const [authMethod, setAuthMethod] = useState('phone');
-    const [formData, setFormData] = useState({name: '', phone: '', email: '', password: ''
+    const [authMethod, setAuthMethod] = useState('email'); // Default to email since backend only supports email
+    const [formData, setFormData] = useState({
+        name: '', 
+        phone: '', 
+        email: '', 
+        password: ''
     });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -36,46 +42,76 @@ export default function RegisterScreen({ navigation }) {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
+        // Validation
         if (!formData.name.trim()) {
             Alert.alert('Error', 'Please enter your full name');
             return;
         }
-        if (authMethod === 'phone' && !formData.phone) {
-            Alert.alert('Error', 'Please enter your phone number');
-            return;
-        }
-        if (authMethod === 'email' && !formData.email) {
+        
+        if (!formData.email.trim()) {
             Alert.alert('Error', 'Please enter your email address');
             return;
         }
+
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email.trim())) {
+            Alert.alert('Error', 'Please enter a valid email address');
+            return;
+        }
+
         if (!formData.password) {
             Alert.alert('Error', 'Please enter a password');
             return;
         }
+        
         if (formData.password.length < 6) {
             Alert.alert('Error', 'Password must be at least 6 characters');
             return;
         }
 
         setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-            Alert.alert(
-                'Success',
-                'Registration successful! You can now login.',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () =>
-                            navigation.reset({
+
+        try {
+            const response = await fetch(getApiUrl(API_ENDPOINTS.REGISTER), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName: formData.name.trim(),
+                    email: formData.email.trim().toLowerCase(),
+                    password: formData.password,
+                    phone: formData.phone.trim() || null, // Optional phone number
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                Alert.alert(
+                    'Success',
+                    'Registration successful! You can now login with your credentials.',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => navigation.reset({
                                 index: 0,
-                                routes: [{ name: 'Login' }], // Navigate to Login and reset stack
+                                routes: [{ name: 'Login' }],
                             }),
-                    },
-                ]
-            );
-        }, 2000);
+                        },
+                    ]
+                );
+            } else {
+                Alert.alert('Registration Failed', data.error || 'Registration failed. Please try again.');
+            }
+        } catch (error) {
+            const errorMessage = handleApiError(error);
+            Alert.alert('Error', errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -99,20 +135,9 @@ export default function RegisterScreen({ navigation }) {
                             </View>
                         </Animated.View>
 
-                        {/* Auth Method Toggle */}
+                        {/* Registration Form */}
                         <Animated.View
                             style={[css.formSection, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-                            <View style={css.authMethodContainer}>
-                                <TouchableOpacity style={[css.methodButton, authMethod === 'phone' && css.activeMethod]} onPress={() => setAuthMethod('phone')}>
-                                    <Ionicons name="call" size={18} color={authMethod === 'phone' ? 'white' : '#4CAF50'}/>
-                                    <Text style={[css.methodText, authMethod === 'phone' && css.activeMethodText]}>Phone</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity style={[css.methodButton, authMethod === 'email' && css.activeMethod]} onPress={() => setAuthMethod('email')}>
-                                    <Ionicons name="mail" size={18} color={authMethod === 'email' ? 'white' : '#4CAF50'}/>
-                                    <Text style={[css.methodText, authMethod === 'email' && css.activeMethodText]}>Email</Text>
-                                </TouchableOpacity>
-                            </View>
 
                             {/* Form */}
                             <View style={css.formContainer}>
@@ -120,22 +145,44 @@ export default function RegisterScreen({ navigation }) {
                                 <View style={css.inputContainer}>
                                     <View style={css.inputWrapper}>
                                         <Ionicons name="person" size={18} color="#666" style={css.inputIcon} />
-                                        <TextInput style={css.textInput} placeholder="Full Name" value={formData.name} onChangeText={(text) => handleInputChange('name', text)} placeholderTextColor="#999"/>
+                                        <TextInput 
+                                            style={css.textInput} 
+                                            placeholder="Full Name" 
+                                            value={formData.name} 
+                                            onChangeText={(text) => handleInputChange('name', text)} 
+                                            placeholderTextColor="#999"
+                                            autoCapitalize="words"
+                                        />
                                     </View>
                                 </View>
 
-                                {/* Phone or Email */}
+                                {/* Email Address */}
                                 <View style={css.inputContainer}>
                                     <View style={css.inputWrapper}>
-                                        <Ionicons name={authMethod === 'phone' ? 'call' : 'mail'} size={18} color="#666" style={css.inputIcon}/>
+                                        <Ionicons name="mail" size={18} color="#666" style={css.inputIcon}/>
                                         <TextInput
                                             style={css.textInput}
-                                            placeholder={authMethod === 'phone' ? 'Phone Number' : 'Email Address'}
-                                            value={authMethod === 'phone' ? formData.phone : formData.email}
-                                            onChangeText={(text) =>
-                                                handleInputChange(authMethod === 'phone' ? 'phone' : 'email', text)
-                                            }
-                                            keyboardType={authMethod === 'phone' ? 'phone-pad' : 'email-address'}
+                                            placeholder="Email Address"
+                                            value={formData.email}
+                                            onChangeText={(text) => handleInputChange('email', text)}
+                                            keyboardType="email-address"
+                                            placeholderTextColor="#999"
+                                            autoCapitalize="none"
+                                            autoCorrect={false}
+                                        />
+                                    </View>
+                                </View>
+
+                                {/* Phone Number (Optional) */}
+                                <View style={css.inputContainer}>
+                                    <View style={css.inputWrapper}>
+                                        <Ionicons name="call" size={18} color="#666" style={css.inputIcon}/>
+                                        <TextInput
+                                            style={css.textInput}
+                                            placeholder="Phone Number (Optional)"
+                                            value={formData.phone}
+                                            onChangeText={(text) => handleInputChange('phone', text)}
+                                            keyboardType="phone-pad"
                                             placeholderTextColor="#999"
                                         />
                                     </View>

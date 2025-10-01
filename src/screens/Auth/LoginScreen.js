@@ -3,9 +3,12 @@ import {View, Text, TextInput, TouchableOpacity, Alert, Animated, KeyboardAvoidi
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { css } from './AdaptiveAuthStyles';
+import { getApiUrl, API_ENDPOINTS } from '../../config/api';
+import { authStorage } from '../../utils/authStorage';
+import { handleApiError } from '../../utils/errorHandler';
 
 export default function LoginScreen({ navigation }) {
-    const [authMethod, setAuthMethod] = useState('phone');
+    const [authMethod, setAuthMethod] = useState('email'); // Default to email since backend only supports email
     const [formData, setFormData] = useState({ phone: '', email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -24,11 +27,12 @@ export default function LoginScreen({ navigation }) {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         setIsLoading(true);
 
-        if ((!formData.phone && authMethod === 'phone') || (!formData.email && authMethod === 'email')) {
-            Alert.alert('Error', `Please enter your ${authMethod}`);
+        // Validation - only support email login since backend expects email
+        if (!formData.email) {
+            Alert.alert('Error', 'Please enter your email');
             setIsLoading(false);
             return;
         }
@@ -39,32 +43,46 @@ export default function LoginScreen({ navigation }) {
             return;
         }
 
-        setTimeout(() => {
-            setIsLoading(false);
-            if(formData.phone === "0" || (formData.email.trim().toLowerCase() ==="test@123.com") && (formData.password==="1234"))
-            {
+        try {
+            const response = await fetch(getApiUrl(API_ENDPOINTS.LOGIN), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: formData.email.trim().toLowerCase(),
+                    password: formData.password,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Store the JWT token and user data
+                await authStorage.storeToken(data.token);
+                await authStorage.storeUserData({
+                    email: formData.email.trim().toLowerCase(),
+                    role: data.role,
+                });
+
                 Alert.alert('Success', 'Login successful!', [
                     {
                         text: 'OK',
                         onPress: () => navigation.reset({
                             index: 0,
-                            routes: [{ name: 'Home' }], // Navigate to Home and reset stack
+                            routes: [{ name: 'Home' }],
                         }),
                     },
                 ]);
-            }else{
-                Alert.alert('failed', 'Login failed!', [
-                    {
-                        text: 'OK',
-                        // onPress: () => navigation.reset({
-                        //     index: 0,
-                        //     routes: [{ name: 'Login' }], // Navigate to Login and reset stack
-                        // }),
-                    },
-                ]);
+            } else {
+                Alert.alert('Login Failed', data.error || 'Invalid credentials');
             }
-
-        }, 2000);
+        } catch (error) {
+            const errorMessage = handleApiError(error);
+            Alert.alert('Error', errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
 
@@ -95,67 +113,34 @@ export default function LoginScreen({ navigation }) {
                             </View>
                         </Animated.View>
 
-                        {/* Auth Method Toggle */}
+                        {/* Form Section - Email Login Only */}
                         <Animated.View
                             style={[
                                 css.formSection,
                                 { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }
                             ]}
                         >
-                            <View style={css.authMethodContainer}>
-                                <TouchableOpacity
-                                    style={[css.methodButton, authMethod === 'phone' && css.activeMethod]}
-                                    onPress={() => setAuthMethod('phone')}
-                                >
-                                    <Ionicons
-                                        name="call"
-                                        size={18}
-                                        color={authMethod === 'phone' ? 'white' : '#4CAF50'}
-                                    />
-                                    <Text
-                                        style={[css.methodText, authMethod === 'phone' && css.activeMethodText]}
-                                    >
-                                        Phone
-                                    </Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                    style={[css.methodButton, authMethod === 'email' && css.activeMethod]}
-                                    onPress={() => setAuthMethod('email')}
-                                >
-                                    <Ionicons
-                                        name="mail"
-                                        size={18}
-                                        color={authMethod === 'email' ? 'white' : '#4CAF50'}
-                                    />
-                                    <Text
-                                        style={[css.methodText, authMethod === 'email' && css.activeMethodText]}
-                                    >
-                                        Email
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
 
                             {/* Form */}
                             <View style={css.formContainer}>
-                                {/* Phone or Email Input */}
+                                {/* Email Input */}
                                 <View style={css.inputContainer}>
                                     <View style={css.inputWrapper}>
                                         <Ionicons
-                                            name={authMethod === 'phone' ? 'call' : 'mail'}
+                                            name="mail"
                                             size={18}
                                             color="#666"
                                             style={css.inputIcon}
                                         />
                                         <TextInput
                                             style={css.textInput}
-                                            placeholder={authMethod === 'phone' ? 'Phone Number' : 'Email Address'}
-                                            value={authMethod === 'phone' ? formData.phone : formData.email}
-                                            onChangeText={(text) =>
-                                                handleInputChange(authMethod === 'phone' ? 'phone' : 'email', text)
-                                            }
-                                            keyboardType={authMethod === 'phone' ? 'phone-pad' : 'email-address'}
+                                            placeholder="Email Address"
+                                            value={formData.email}
+                                            onChangeText={(text) => handleInputChange('email', text)}
+                                            keyboardType="email-address"
                                             placeholderTextColor="#999"
+                                            autoCapitalize="none"
+                                            autoCorrect={false}
                                         />
                                     </View>
                                 </View>

@@ -8,32 +8,54 @@ import {
     Animated,
     Dimensions,
     RefreshControl,
-    Alert
+    Alert,
+    Keyboard
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import {styles,getResponsiveValue} from "./Styles";
+import ProfileScreen from '../Profile';
+import useLocation from '../../hooks/useLocation';
+import { useWeather } from '../../hooks/useWeather';
+import WeatherDisplay from '../../components/WeatherDisplay';
 
 
 const HomeScreen = ({ navigation }) => {
     const [isListening, setIsListening] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [activeTab, setActiveTab] = useState('Home');
+    const [profileVisible, setProfileVisible] = useState(false);
+    const [weatherModalVisible, setWeatherModalVisible] = useState(false);
+
+    // Location hook with auto-start
+    const {
+        location,
+        address,
+        loading: locationLoading,
+        error: locationError,
+        getCurrentLocation,
+        getFormattedAddress,
+        isLocationAvailable
+    } = useLocation({ autoStart: true });
+
+    // Weather hook - automatically fetch when location changes
+    const {
+        weather,
+        loading: weatherLoading,
+        error: weatherError,
+        fetchCurrentWeather,
+        refreshWeather,
+        current,
+        hasCurrentWeather
+    } = useWeather(location, true); // Auto-fetch weather when location changes
 
     // Animation refs
     const pulseAnim = useRef(new Animated.Value(1)).current;
     const pulseRing1 = useRef(new Animated.Value(0.8)).current;
     const pulseRing2 = useRef(new Animated.Value(0.8)).current;
 
-    // Sample data
+    // Dashboard data (non-weather)
     const [dashboardData] = useState({
-        weather: {
-            temp: 28,
-            condition: 'Sunny',
-            location: 'luanshya',
-            humidity: 65,
-            rainfall: 20
-        },
         cropAdvisory: {
             title: 'Maize',
             status: 'Flowering Stage',
@@ -105,23 +127,54 @@ const HomeScreen = ({ navigation }) => {
         }
     }, [isListening]);
 
-    const handleVoicePress = () => {
+    const handleVoicePress = async () => {
         setIsListening(!isListening);
         if (!isListening) {
+            // Test location data when voice is pressed
+            try {
+                const locationData = await getCurrentLocation();
+                
+                const locationInfo = `
+📍 LOCATION FOUND!
+Coordinates: ${locationData.latitude.toFixed(6)}, ${locationData.longitude.toFixed(6)}
+Accuracy: ${locationData.accuracy}m
 
-            setTimeout(() => {
-                setIsListening(false);
-                Alert.alert('Voice', 'Say something like "What\'s the weather?" or "Show my crops"');
-            }, 3000);
+🏠 Address: ${locationData.address ? locationData.address.formattedAddress : 'Address not available'}
+
+${locationData.address ? `
+City: ${locationData.address.city || 'Unknown'}
+Region: ${locationData.address.region || 'Unknown'}
+Country: ${locationData.address.country || 'Unknown'}` : ''}`;
+
+                setTimeout(() => {
+                    setIsListening(false);
+                    Alert.alert('Current Location Data', locationInfo);
+                }, 2000);
+            } catch (error) {
+                setTimeout(() => {
+                    setIsListening(false);
+                    Alert.alert('Voice + Location', 'Say something like "What\'s the weather?" or "Show my crops"\n\nLocation: ' + (error.message || 'Not available'));
+                }, 3000);
+            }
         }
     };
 
-    const onRefresh = () => {
+    const onRefresh = async () => {
         setRefreshing(true);
-        // Simulate data refresh
-        setTimeout(() => {
+        try {
+            // Refresh location data
+            await getCurrentLocation();
+            // Refresh weather data if location is available
+            if (location) {
+                await refreshWeather();
+            }
+            setTimeout(() => {
+                setRefreshing(false);
+            }, 1000);
+        } catch (error) {
+            console.log('Refresh error:', error);
             setRefreshing(false);
-        }, 1000);
+        }
     };
 
     const navigationItems = [
@@ -132,14 +185,68 @@ const HomeScreen = ({ navigation }) => {
     ];
 
     const WeatherCard = () => (
-        <TouchableOpacity style={[styles.infoCard, styles.weatherCard]} activeOpacity={0.8}>
+        <TouchableOpacity style={[styles.infoCard, styles.weatherCard]} activeOpacity={0.8} onPress={async () => {
+            if (!isLocationAvailable) {
+                await getCurrentLocation();
+            } else if (!hasCurrentWeather && location) {
+                await fetchCurrentWeather(location);
+            } else {
+                setWeatherModalVisible(true);
+            }
+        }}>
             <View style={styles.weatherCardContent}>
                 <View style={styles.weatherIcon}>
-                    <Ionicons name="sunny" size={getResponsiveValue(32, 36, 40)} color="#FFD700" />
+                    {locationLoading ? (
+                        <Ionicons name="location" size={getResponsiveValue(32, 36, 40)} color="#4CAF50" />
+                    ) : weatherLoading ? (
+                        <Ionicons name="sync" size={getResponsiveValue(32, 36, 40)} color="#4A90E2" />
+                    ) : hasCurrentWeather ? (
+                        <Ionicons 
+                            name={current?.icon === 'sunny' ? 'sunny' : current?.icon === 'rainy' ? 'rainy' : 'cloudy'} 
+                            size={getResponsiveValue(32, 36, 40)} 
+                            color={current?.icon === 'sunny' ? '#FFD700' : current?.icon === 'rainy' ? '#4A90E2' : '#95A5A6'} 
+                        />
+                    ) : weatherError ? (
+                        <Ionicons name="cloud-offline" size={getResponsiveValue(32, 36, 40)} color="#f44336" />
+                    ) : locationError ? (
+                        <Ionicons name="location-outline" size={getResponsiveValue(32, 36, 40)} color="#f44336" />
+                    ) : (
+                        <Ionicons name="cloud-outline" size={getResponsiveValue(32, 36, 40)} color="#95A5A6" />
+                    )}
                 </View>
-                <Text style={styles.weatherTemp}>{dashboardData.weather.temp}°C</Text>
-                <Text style={styles.weatherCondition}>{dashboardData.weather.condition}</Text>
-                <Text style={styles.weatherLocation}>{dashboardData.weather.location}</Text>
+                <Text style={styles.weatherTemp}>
+                    {hasCurrentWeather ? `${current.temperature}°C` : '--°C'}
+                </Text>
+                <Text style={styles.weatherCondition}>
+                    {hasCurrentWeather ? current.condition : locationLoading ? 'Getting location...' : weatherLoading ? 'Loading weather...' : 'Tap to get weather'}
+                </Text>
+                <Text style={styles.weatherLocation}>
+                    {locationLoading ? 'Getting location...' : 
+                     address ? (address.city || address.district || address.subregion || address.region || 'Unknown location') : 
+                     'Tap to get location'}
+                </Text>
+                
+                {/* Status indicators */}
+                {weatherLoading && (
+                    <Text style={[styles.weatherLocation, { color: '#4A90E2', fontSize: 10 }]}>
+                        Loading weather data...
+                    </Text>
+                )}
+                {weatherError && !weatherLoading && (
+                    <Text style={[styles.weatherLocation, { color: '#f44336', fontSize: 10 }]}>
+                        Weather unavailable - Tap to retry
+                    </Text>
+                )}
+                {locationError && !locationLoading && (
+                    <Text style={[styles.weatherLocation, { color: '#f44336', fontSize: 10 }]}>
+                        Location unavailable - Tap to retry
+                    </Text>
+                )}
+                {hasCurrentWeather && (
+                    <Text style={[styles.weatherLocation, { color: '#4CAF50', fontSize: 10 }]}>
+                        Live weather data
+                    </Text>
+                )}
             </View>
         </TouchableOpacity>
     );
@@ -192,13 +299,20 @@ const HomeScreen = ({ navigation }) => {
                 <View style={[styles.cardIcon, { backgroundColor: '#e3f2fd' }]}>
                     <Ionicons name="newspaper" size={getResponsiveValue(16, 18, 20)} color="#2196F3" />
                 </View>
-                <Text style={styles.cardTitle}>Farm News</Text>
+                <Text style={styles.cardTitle}>Farm Insights</Text>
             </View>
-            <Text style={styles.cardValue}>3 New Updates</Text>
-            <Text style={styles.cardSubtext}>Weather alerts, market trends</Text>
+            <Text style={styles.cardValue}>
+                {hasCurrentWeather ? 'Weather Data Active' : '3 New Updates'}
+            </Text>
+            <Text style={styles.cardSubtext}>
+                {hasCurrentWeather ? 'Real-time weather monitoring' : 'Weather alerts, market trends'}
+            </Text>
             <View style={styles.newsAlert}>
                 <Text style={styles.newsAlertText}>
-                    Heavy rains expected this weekend
+                    {hasCurrentWeather 
+                        ? `Current: ${current.temperature}°C ${current.condition}`
+                        : 'Heavy rains expected this weekend'
+                    }
                 </Text>
             </View>
         </TouchableOpacity>
@@ -221,10 +335,41 @@ const HomeScreen = ({ navigation }) => {
                             {/*<Text style={styles.logoText}>AGRO SPEAK</Text>*/}
                         </View>
                         <View style={styles.headerIcons}>
-                            <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.7} onPress={()=>{alert("notifications features  coming soon")}}>
-                                <Ionicons name="notifications-outline" size={getResponsiveValue(20, 22, 24)} color="#s" />
+                            <TouchableOpacity 
+                                style={styles.headerIconButton} 
+                                activeOpacity={0.7} 
+                                onPress={async () => {
+                                    try {
+                                        await getCurrentLocation();
+                                        Alert.alert(
+                                            'Current Location', 
+                                            address ? address.formattedAddress : 'Location retrieved successfully'
+                                        );
+                                    } catch (error) {
+                                        console.log('Location error:', error);
+                                    }
+                                }}
+                            >
+                                <Ionicons 
+                                    name={locationLoading ? "location" : isLocationAvailable ? "location" : "location-outline"} 
+                                    size={getResponsiveValue(20, 22, 24)} 
+                                    color={isLocationAvailable ? "#4CAF50" : "#666"} 
+                                />
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.7} onPress={()=>{alert("profile features  coming soon")}}>
+                            <TouchableOpacity 
+                                style={styles.headerIconButton} 
+                                activeOpacity={0.7} 
+                                onPress={() => navigation.navigate('WeatherTest')}
+                            >
+                                <Ionicons name="cloudy-outline" size={getResponsiveValue(20, 22, 24)} color="#4A90E2" />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.7} onPress={()=>{alert("notifications features  coming soon")}}>
+                                <Ionicons name="notifications-outline" size={getResponsiveValue(20, 22, 24)} color="#666" />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.7} onPress={() => {
+                                Keyboard.dismiss();
+                                setProfileVisible(true);
+                            }}>
                                 <Ionicons name="person-circle-outline" size={getResponsiveValue(20, 22, 24)} color="#666" />
                             </TouchableOpacity>
                         </View>
@@ -374,6 +519,36 @@ const HomeScreen = ({ navigation }) => {
                     </View>
                 </SafeAreaView>
             </SafeAreaView>
+
+            {/* Profile Screen */}
+            <ProfileScreen
+                visible={profileVisible}
+                onClose={() => setProfileVisible(false)}
+                navigation={navigation}
+            />
+
+            {/* Weather Details Modal */}
+            {weatherModalVisible && (
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Weather Details</Text>
+                            <TouchableOpacity onPress={() => setWeatherModalVisible(false)}>
+                                <Ionicons name="close" size={24} color="#2C3E50" />
+                            </TouchableOpacity>
+                        </View>
+                        <WeatherDisplay 
+                            weather={weather}
+                            loading={weatherLoading}
+                            error={weatherError}
+                            onRefresh={refreshWeather}
+                            showForecast={true}
+                            showSoil={true}
+                            compact={false}
+                        />
+                    </View>
+                </View>
+            )}
         </SafeAreaProvider>
     );
 };
