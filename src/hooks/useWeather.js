@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import weatherService from '../utils/weatherService';
 
-export const useWeather = (location = null, autoFetch = false) => {
+ const useWeather = (location = null, autoFetch = false) => {
     const [weather, setWeather] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -183,4 +183,5 @@ export const useWeather = (location = null, autoFetch = false) => {
         soil: weather?.soil || null,
         weatherLocation: weather?.location || null
     };
-};
+}
+ export default useWeather

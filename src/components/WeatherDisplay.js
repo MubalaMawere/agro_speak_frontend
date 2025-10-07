@@ -214,6 +214,7 @@ const WeatherDisplay = ({
         </ScrollView>
     );
 };
+export default WeatherDisplay;
 
 const styles = StyleSheet.create({
     container: {
@@ -481,5 +482,3 @@ const styles = StyleSheet.create({
         flex: 1,
     },
 });
-
-export default WeatherDisplay;

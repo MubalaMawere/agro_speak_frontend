@@ -6,13 +6,13 @@ import {
     StyleSheet, 
     ScrollView, 
     Alert,
-    SafeAreaView,
+    
     StatusBar
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import useLocation from '../../hooks/useLocation';
-import { useWeather } from '../../hooks/useWeather';
-import WeatherDisplay from '../../components/WeatherDisplay';
+import useLocation from '../hooks/useLocation';
+import useWeather from '../hooks/useWeather';
+import WeatherDisplay from '../components/WeatherDisplay';
 
 const WeatherTestScreen = ({ navigation }) => {
     const [testResults, setTestResults] = useState([]);

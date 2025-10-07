@@ -12,11 +12,13 @@ import {
     Keyboard
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
 import { Ionicons } from '@expo/vector-icons';
 import {styles,getResponsiveValue} from "./Styles";
 import ProfileScreen from '../Profile';
 import useLocation from '../../hooks/useLocation';
-import { useWeather } from '../../hooks/useWeather';
+
+import  useWeather  from '../../hooks/useWeather';
 import WeatherDisplay from '../../components/WeatherDisplay';
 
 
