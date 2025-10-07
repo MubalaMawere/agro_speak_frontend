@@ -58,8 +58,8 @@ import weatherService from '../utils/weatherService';
             
             return currentWeather;
         } catch (err) {
-            console.error('Error fetching current weather:', err);
-            setError(err.message || 'Failed to fetch current weather');
+          //  console.error('Error fetching current weather:', err);
+           // setError(err.message || 'Failed to fetch current weather');
             return null;
         } finally {
             setLoading(false);
@@ -71,7 +71,7 @@ import weatherService from '../utils/weatherService';
         const locationToUse = targetLocation || location;
         
         if (!locationToUse || !locationToUse.latitude || !locationToUse.longitude) {
-            setError('Location is required to fetch forecast data');
+          //  setError('Location is required to fetch forecast data');
             return null;
         }
 
@@ -94,7 +94,7 @@ import weatherService from '../utils/weatherService';
             return forecast;
         } catch (err) {
             console.error('Error fetching forecast:', err);
-            setError(err.message || 'Failed to fetch forecast data');
+           // setError(err.message || 'Failed to fetch forecast data');
             return null;
         } finally {
             setLoading(false);
@@ -106,7 +106,7 @@ import weatherService from '../utils/weatherService';
         const locationToUse = targetLocation || location;
         
         if (!locationToUse || !locationToUse.latitude || !locationToUse.longitude) {
-            setError('Location is required to fetch soil data');
+           // setError('Location is required to fetch soil data');
             return null;
         }
 
@@ -127,8 +127,8 @@ import weatherService from '../utils/weatherService';
             
             return soilData;
         } catch (err) {
-            console.error('Error fetching soil data:', err);
-            setError(err.message || 'Failed to fetch soil data');
+           // console.error('Error fetching soil data:', err);
+           // setError(err.message || 'Failed to fetch soil data');
             return null;
         } finally {
             setLoading(false);
