@@ -9,24 +9,31 @@ import {
     Dimensions,
     RefreshControl,
     Alert,
-    Keyboard
+    Keyboard,Image,Button,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
 import { Ionicons } from '@expo/vector-icons';
 import {styles,getResponsiveValue} from "./Styles";
 import ProfileScreen from '../Profile';
 import useLocation from '../../hooks/useLocation';
-import { useWeather } from '../../hooks/useWeather';
-import WeatherDisplay from '../../components/WeatherDisplay';
 
+import  useWeather  from '../../hooks/useWeather';
+import WeatherDisplay from '../../components/WeatherDisplay';
+import farmer2 from '../../../assets/farmer2.jpg';
+import VoiceRecording from '../../components/voiceRecording';
+
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
 
 const HomeScreen = ({ navigation }) => {
+  
     const [isListening, setIsListening] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [activeTab, setActiveTab] = useState('Home');
     const [profileVisible, setProfileVisible] = useState(false);
     const [weatherModalVisible, setWeatherModalVisible] = useState(false);
-
+     const[recordingOn,setRecordingOn]=useState(false);
     // Location hook with auto-start
     const {
         location,
@@ -53,6 +60,7 @@ const HomeScreen = ({ navigation }) => {
     const pulseAnim = useRef(new Animated.Value(1)).current;
     const pulseRing1 = useRef(new Animated.Value(0.8)).current;
     const pulseRing2 = useRef(new Animated.Value(0.8)).current;
+
 
     // Dashboard data (non-weather)
     const [dashboardData] = useState({
@@ -127,6 +135,15 @@ const HomeScreen = ({ navigation }) => {
         }
     }, [isListening]);
 
+const handleRecording=(status)=>{
+    setStartRecord(!startRecord);
+    if(status==true){
+        VoiceRecording(status);
+    }else{
+        VoiceRecording(status);
+    }
+    
+}
     const handleVoicePress = async () => {
         setIsListening(!isListening);
         if (!isListening) {
@@ -144,7 +161,7 @@ Accuracy: ${locationData.accuracy}m
 ${locationData.address ? `
 City: ${locationData.address.city || 'Unknown'}
 Region: ${locationData.address.region || 'Unknown'}
-Country: ${locationData.address.country || 'Unknown'}` : ''}`;
+         Country: ${locationData.address.country || 'Unknown'}` : ''}`;
 
                 setTimeout(() => {
                     setIsListening(false);
@@ -384,9 +401,25 @@ Country: ${locationData.address.country || 'Unknown'}` : ''}`;
                     showsVerticalScrollIndicator={false}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#4CAF50']} />}
                 >
-                    {/* Voice Assistant Section */}
+                    {/* Voice Assistant Section  or the top section*/}
                     <View style={styles.voiceSection}>
-                        <TouchableOpacity style={[styles.voiceButton, isListening && styles.voiceButtonActive]} onPress={handleVoicePress} activeOpacity={0.8}>
+                    
+                    <Image
+                    source={farmer2}
+                    style={{width:screenWidth*1, 
+                        height:screenHeight*.4,
+                        position:'absolute',
+                         resizeMode:'contain',
+                        top:0, 
+                        borderBottomLeftRadius:50,
+                        }}
+                    />
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <VoiceRecording />
+
+      
+    </View>
+                        {/* <TouchableOpacity style={[styles.voiceButton, isListening && styles.voiceButtonActive]} onPress={()=>handleRecording(startRecord)} activeOpacity={0.8}>
                             {isListening && (
                                 <>
                                     <Animated.View style={[
@@ -428,7 +461,7 @@ Country: ${locationData.address.country || 'Unknown'}` : ''}`;
                             <Text style={styles.voiceButtonText}>
                                 {isListening ? "Listening..." : "Tap to Speak"}
                             </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <Text style={[styles.voiceStatusText, isListening && styles.voiceStatusActive]}>
                             {isListening ? "I'm listening..." : "Voice Assistant Ready"}
                         </Text>

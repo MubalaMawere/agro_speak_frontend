@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Alert } from 'react-native';
 import locationService from '../utils/locationService';
 
-export const useLocation = (options = {}) => {
+ const useLocation = (options = {}) => {
     const {
         autoStart = false,
         watchLocation = false,

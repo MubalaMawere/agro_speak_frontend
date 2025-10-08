@@ -1,5 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {View, Text, TextInput, TouchableOpacity, Alert, Animated, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,} from 'react-native';
+import {
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    Alert,
+    Animated,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    ActivityIndicator,
+} from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { css } from './AdaptiveAuthStyles';
@@ -57,7 +68,7 @@ export default function LoginScreen({ navigation }) {
 
             const data = await response.json();
 
-            if (response.ok) {
+            if (!response.ok) {
                 // Store the JWT token and user data
                 await authStorage.storeToken(data.token);
                 await authStorage.storeUserData({
@@ -178,7 +189,15 @@ export default function LoginScreen({ navigation }) {
                                 {/* Login Button */}
                                 <TouchableOpacity
                                     style={[css.submitButton, isLoading && css.submitButtonDisabled]}
-                                    onPress={handleLogin}
+                                    //  onPress={handleLogin}
+                                onPress={()=>{navigation.reset({
+                                    index :0,
+                                     routes: [{name:'Home'}]
+
+                                    })
+                                    }
+                                }
+
                                     disabled={isLoading}
                                 >
                                     {isLoading ? (

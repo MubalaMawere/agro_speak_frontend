@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import weatherService from '../utils/weatherService';
 
-export const useWeather = (location = null, autoFetch = false) => {
+ const useWeather = (location = null, autoFetch = false) => {
     const [weather, setWeather] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -58,8 +58,8 @@ export const useWeather = (location = null, autoFetch = false) => {
             
             return currentWeather;
         } catch (err) {
-            console.error('Error fetching current weather:', err);
-            setError(err.message || 'Failed to fetch current weather');
+          //  console.error('Error fetching current weather:', err);
+           // setError(err.message || 'Failed to fetch current weather');
             return null;
         } finally {
             setLoading(false);
@@ -71,7 +71,7 @@ export const useWeather = (location = null, autoFetch = false) => {
         const locationToUse = targetLocation || location;
         
         if (!locationToUse || !locationToUse.latitude || !locationToUse.longitude) {
-            setError('Location is required to fetch forecast data');
+          //  setError('Location is required to fetch forecast data');
             return null;
         }
 
@@ -94,7 +94,7 @@ export const useWeather = (location = null, autoFetch = false) => {
             return forecast;
         } catch (err) {
             console.error('Error fetching forecast:', err);
-            setError(err.message || 'Failed to fetch forecast data');
+           // setError(err.message || 'Failed to fetch forecast data');
             return null;
         } finally {
             setLoading(false);
@@ -106,7 +106,7 @@ export const useWeather = (location = null, autoFetch = false) => {
         const locationToUse = targetLocation || location;
         
         if (!locationToUse || !locationToUse.latitude || !locationToUse.longitude) {
-            setError('Location is required to fetch soil data');
+           // setError('Location is required to fetch soil data');
             return null;
         }
 
@@ -127,8 +127,8 @@ export const useWeather = (location = null, autoFetch = false) => {
             
             return soilData;
         } catch (err) {
-            console.error('Error fetching soil data:', err);
-            setError(err.message || 'Failed to fetch soil data');
+           // console.error('Error fetching soil data:', err);
+           // setError(err.message || 'Failed to fetch soil data');
             return null;
         } finally {
             setLoading(false);
@@ -183,4 +183,5 @@ export const useWeather = (location = null, autoFetch = false) => {
         soil: weather?.soil || null,
         weatherLocation: weather?.location || null
     };
-};
+}
+ export default useWeather

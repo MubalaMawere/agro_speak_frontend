@@ -103,6 +103,7 @@ export  const  styles = {
         paddingHorizontal: 20,
         paddingVertical: getResponsiveValue(20, 25, 30),
         alignItems: 'center',
+      
     },
 
     voiceButton: {
@@ -132,14 +133,14 @@ export  const  styles = {
     voiceButtonText: {
         color: 'white',
         fontSize: getResponsiveValue(12, 13, 14),
-        fontWeight: '600',
+        fontWeight: '700',
         textAlign: 'center',
     },
 
     voiceStatusText: {
         fontSize: getResponsiveValue(16, 18, 20),
         fontWeight: '600',
-        color: '#4CAF50',
+        color: '#ffffffff',
         marginTop: getResponsiveValue(12, 15, 18),
         textAlign: 'center',
     },
@@ -150,13 +151,14 @@ export  const  styles = {
 
     voiceHintText: {
         fontSize: getResponsiveValue(12, 13, 14),
-        color: '#666',
+        color: '#ffffffff',
         textAlign: 'center',
         marginTop: 4,
     },
 
     // Quick Info Cards Section
     cardsSection: {
+        marginTop:20,
         paddingHorizontal: 20,
         paddingBottom: getResponsiveValue(15, 18, 20),
     },
@@ -171,7 +173,7 @@ export  const  styles = {
     sectionTitle: {
         fontSize: getResponsiveValue(18, 20, 22),
         fontWeight: 'bold',
-        color: '#333',
+        color: '#ffffffff',
     },
 
     seeAllButton: {
