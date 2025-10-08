@@ -102,8 +102,20 @@ export  const  styles = {
     voiceSection: {
         paddingHorizontal: 20,
         paddingVertical: getResponsiveValue(20, 25, 30),
-        alignItems: 'center',
+        alignItems:'center',
+        height:height*.3,
+        backgroundColor:'red',
+          overflow:'hidden',
+         borderBottomLeftRadius: 50,
       
+    },
+    bg_image: {
+        width: width,
+        
+         position: 'absolute',
+         
+       
+        zIndex:0,
     },
 
     voiceButton: {

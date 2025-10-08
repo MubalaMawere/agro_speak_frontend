@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {View, Text, TouchableOpacity, Animated, ScrollView, StatusBar} from 'react-native';
+import { View, Text, TouchableOpacity, Animated, ScrollView, StatusBar, Dimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import {css} from "../Auth/AdaptiveAuthStyles";
-import {styles,getResponsiveValue} from "./onboardStyles";
+import { css } from "../Auth/AdaptiveAuthStyles";
+import { styles, getResponsiveValue } from "./onboardStyles";
 
-
+const screenWidth = Dimensions.get('window').width;
 export default function OnboardingScreens({ navigation }) {
     const [currentScreen, setCurrentScreen] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -66,12 +66,12 @@ export default function OnboardingScreens({ navigation }) {
     useEffect(() => {
         // Animate content when screen changes
         Animated.parallel([
-            Animated.timing(fadeAnim, {toValue: 1, duration: 800, useNativeDriver: true,}),
-            Animated.timing(slideAnim, {toValue: 0, duration: 600, useNativeDriver: true,}),
+            Animated.timing(fadeAnim, { toValue: 1, duration: 800, useNativeDriver: true, }),
+            Animated.timing(slideAnim, { toValue: 0, duration: 600, useNativeDriver: true, }),
         ]).start();
 
         // Reset animations for next screen
-        return () => {fadeAnim.setValue(0);slideAnim.setValue(50);};
+        return () => { fadeAnim.setValue(0); slideAnim.setValue(50); };
     }, [currentScreen]);
 
     useEffect(() => {
@@ -235,121 +235,145 @@ export default function OnboardingScreens({ navigation }) {
     return (
         <SafeAreaProvider>
             <SafeAreaView style={css.container} edges={['top', 'bottom']}>
-            <StatusBar backgroundColor="#f8f9fa" barStyle="dark-content" />
+                <StatusBar backgroundColor="#f8f9fa" barStyle="dark-content" />
 
-            {/* Header */}
-            <View style={styles.headerSection}>
-                {/*<View style={styles.logoContainer}>*/}
-                {/*    /!*<View style={styles.logoIcon}>*!/*/}
-                {/*    /!*    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: getResponsiveValue(14, 16, 18) }}>*!/*/}
-                {/*    /!*        AS*!/*/}
-                {/*    /!*    </Text>*!/*/}
-                {/*    /!*</View>*!/*/}
-                {/*    /!*<Text style={styles.logoText}>AGRO SPEAK</Text>*!/*/}
-                {/*</View>*/}
-                {/*{currentScreen < screens.length - 1 && (*/}
-                {/*    <TouchableOpacity onPress={skipToEnd} style={styles.skipButton}>*/}
-                {/*        <Text style={styles.skipButtonText}>Skip</Text>*/}
-                {/*    </TouchableOpacity>*/}
-                {/*)}*/}
-            </View>
-
-            {/*/!* Progress Bar *!/*/}
-            {/*<View style={styles.progressContainer}>*/}
-            {/*    <View style={styles.progressTrack}>*/}
-            {/*        {screens.map((_, index) => (*/}
-            {/*            <View*/}
-            {/*                key={index}*/}
-            {/*                style={[*/}
-            {/*                    styles.progressDot,*/}
-            {/*                    index <= currentScreen && styles.progressDotActive*/}
-            {/*                ]}*/}
-            {/*            />*/}
-            {/*        ))}*/}
-            {/*    </View>*/}
-            {/*</View>*/}
-
-            {/* Main Content */}
-            <View style={styles.contentSection}>
-                <Animated.View style={[styles.contentContainer, {opacity: fadeAnim, transform: [{ translateY: slideAnim }]}]}>
-                    <ScrollView showsVerticalScrollIndicator={false}>
-                        <View style={styles.iconContainer}>
-                            <Ionicons name={currentScreenData.icon} size={getResponsiveValue(48, 56, 64)} color={currentScreenData.iconColor}/>
-                        </View>
-
-                        <Text style={styles.titleText}>{currentScreenData.title}</Text>
-                        <Text style={styles.subtitleText}>{currentScreenData.subtitle}</Text>
-                        <Text style={styles.descriptionText}>{currentScreenData.description}</Text>
-
-                        {/* Interactive Content */}
-                        {renderScreenContent(currentScreenData)}
-
-                        {/* Voice Demo Button */}
-                        {currentScreenData.id === 'voice-commands' && (
-                            <TouchableOpacity
-                                onPress={() => setIsPlaying(!isPlaying)}
-                                style={[
-                                    styles.actionButton,
-                                    isPlaying && styles.actionButtonRed
-                                ]}
-                                activeOpacity={0.8}
-                            >
-                                <Ionicons
-                                    name="play"
-                                    size={20}
-                                    color="white"
-                                />
-                                <Text style={styles.actionButtonText}>
-                                    {isPlaying ? 'Stop Demo' : 'Try Voice Demo'}
-                                </Text>
-                            </TouchableOpacity>
-                        )}
-                    </ScrollView>
-                </Animated.View>
-            </View>
-
-            {/* Navigation */}
-            <View style={styles.bottomSection}>
-                <View style={styles.navigationContainer}>
-                    <TouchableOpacity
-                        onPress={prevScreen}
-                        disabled={currentScreen === 0}
-                        style={[
-                            styles.navButton,
-                            currentScreen === 0 ? styles.navButtonDisabled : styles.navButtonBack
-                        ]}
-                        activeOpacity={currentScreen === 0 ? 1 : 0.7}
-                    >
-                        <Ionicons
-                            name="chevron-back"
-                            size={20}
-                            color={currentScreen === 0 ? '#ccc' : '#666'}
-                        />
-                        <Text style={[
-                            styles.navButtonText,
-                            currentScreen === 0 ? styles.navButtonTextDisabled : styles.navButtonTextBack
-                        ]}>
-                            Back
-                        </Text>
-                    </TouchableOpacity>
-
-                    <Text style={styles.screenCounter}>
-                        {currentScreen + 1} of {screens.length}
-                    </Text>
-
-                    <TouchableOpacity
-                        onPress={currentScreen === screens.length - 1 ? handleGetStarted : nextScreen}
-                        style={[styles.navButton, styles.navButtonNext]}
-                        activeOpacity={0.8}
-                    >
-                        <Text style={[styles.navButtonText, styles.navButtonTextNext]}>
-                            {currentScreen === screens.length - 1 ? 'Get Started' : 'Next'}
-                        </Text>
-                        <Ionicons name="chevron-forward" size={20} color="white" />
-                    </TouchableOpacity>
+                {/* Header */}
+                <View style={styles.headerSection}>
+                    {/*<View style={styles.logoContainer}>*/}
+                    {/*    /!*<View style={styles.logoIcon}>*!/*/}
+                    {/*    /!*    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: getResponsiveValue(14, 16, 18) }}>*!/*/}
+                    {/*    /!*        AS*!/*/}
+                    {/*    /!*    </Text>*!/*/}
+                    {/*    /!*</View>*!/*/}
+                    {/*    /!*<Text style={styles.logoText}>AGRO SPEAK</Text>*!/*/}
+                    {/*</View>*/}
+                    {/*{currentScreen < screens.length - 1 && (*/}
+                    {/*    <TouchableOpacity onPress={skipToEnd} style={styles.skipButton}>*/}
+                    {/*        <Text style={styles.skipButtonText}>Skip</Text>*/}
+                    {/*    </TouchableOpacity>*/}
+                    {/*)}*/}
                 </View>
-            </View>
-        </SafeAreaView>
+
+                {/*/!* Progress Bar *!/*/}
+                {/*<View style={styles.progressContainer}>*/}
+                {/*    <View style={styles.progressTrack}>*/}
+                {/*        {screens.map((_, index) => (*/}
+                {/*            <View*/}
+                {/*                key={index}*/}
+                {/*                style={[*/}
+                {/*                    styles.progressDot,*/}
+                {/*                    index <= currentScreen && styles.progressDotActive*/}
+                {/*                ]}*/}
+                {/*            />*/}
+                {/*        ))}*/}
+                {/*    </View>*/}
+                {/*</View>*/}
+
+                {/* Main Content */}
+                <View style={styles.contentSection}>
+                    <Animated.View style={[styles.contentContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            <View style={styles.iconContainer}>
+                                <Ionicons name={currentScreenData.icon} size={getResponsiveValue(48, 56, 64)} color={currentScreenData.iconColor} />
+                            </View>
+
+                            <Text style={styles.titleText}>{currentScreenData.title}</Text>
+                            <Text style={styles.subtitleText}>{currentScreenData.subtitle}</Text>
+                            <Text style={styles.descriptionText}>{currentScreenData.description}</Text>
+
+                            {/* Interactive Content */}
+                            {renderScreenContent(currentScreenData)}
+
+                            {/* Voice Demo Button */}
+                            {currentScreenData.id === 'voice-commands' && (
+                                <TouchableOpacity
+                                    onPress={() => setIsPlaying(!isPlaying)}
+                                    style={[
+                                        styles.actionButton,
+                                        isPlaying && styles.actionButtonRed
+                                    ]}
+                                    activeOpacity={0.8}
+                                >
+                                    <Ionicons
+                                        name="play"
+                                        size={20}
+                                        color="white"
+                                    />
+                                    <Text style={styles.actionButtonText}>
+                                        {isPlaying ? 'Stop Demo' : 'Try Voice Demo'}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                        </ScrollView>
+                    </Animated.View>
+                </View>
+
+                {/* Navigation */}
+                <View style={styles.bottomSection}>
+                    <TouchableOpacity onPress={() => navigation.replace('Login')} style={{
+
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'transparent',
+                        width: 100,
+                        height: 40,
+                        borderRadius: 20,
+                        marginBottom: 20,
+                        alignSelf: 'flex-start',
+                        paddingHorizontal: 8,
+                        borderWidth: 1,
+                        borderColor: 'green',
+                        flexDirection: 'row',
+                        justifyContent: 'space-around'
+                    }}>
+                        <Text>Skip </Text>
+                        <Ionicons
+                            name='chevron-forward'
+                            size={28}
+                            color={'#1bb300ff'}
+                        />
+                    </TouchableOpacity>
+                    <View style={styles.navigationContainer}>
+                        <TouchableOpacity
+                            onPress={prevScreen}
+                            disabled={currentScreen === 0}
+                            style={[
+                                styles.navButton,
+                                currentScreen === 0 ? styles.navButtonDisabled : styles.navButtonBack
+                            ]}
+                            activeOpacity={currentScreen === 0 ? 1 : 0.7}
+                        >
+                            <Ionicons
+                                name="chevron-back"
+                                size={20}
+                                color={currentScreen === 0 ? '#ccc' : '#666'}
+                            />
+                            <Text style={[
+                                styles.navButtonText,
+                                currentScreen === 0 ? styles.navButtonTextDisabled : styles.navButtonTextBack
+                            ]}>
+                                Back
+                            </Text>
+                        </TouchableOpacity>
+
+                        <Text style={styles.screenCounter}>
+                            {currentScreen + 1} of {screens.length}
+                        </Text>
+
+                        <TouchableOpacity
+                            onPress={currentScreen === screens.length - 1 ? handleGetStarted : nextScreen}
+                            style={[styles.navButton, styles.navButtonNext]}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={[styles.navButtonText, styles.navButtonTextNext]}>
+                                {currentScreen === screens.length - 1 ? 'Get Started' : 'Next'}
+                            </Text>
+                            <Ionicons name="chevron-forward" size={20} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </SafeAreaView>
 
         </SafeAreaProvider>
     );

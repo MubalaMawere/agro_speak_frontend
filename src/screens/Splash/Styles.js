@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-
+import { StyleSheet,Dimensions } from 'react-native';
+const screenWidh = Dimensions.get('window').width;
 export const css = StyleSheet.create({
     container: {
         flex: 1,
@@ -155,4 +155,5 @@ export const css = StyleSheet.create({
         fontSize: 18,
         fontWeight: '600',
     },
+  
 });
