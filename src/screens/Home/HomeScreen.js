@@ -404,8 +404,16 @@ Region: ${locationData.address.region || 'Unknown'}
 
 
                     </View>
-                  
-                    <Text style={[styles.voiceStatusText, isListening && styles.voiceStatusActive]}>
+                    <View style={{
+                        width:screenWidth*1,
+                        height:60,
+                        backgroundColor:'transparent',
+                        position:'absolute',
+                        bottom:0,
+                        
+
+                    }}>
+                  <Text style={[styles.voiceStatusText, isListening && styles.voiceStatusActive, {marginTop:8}]}>
                         {isListening ? "I'm listening..." : "Voice Assistant Ready"}
                     </Text>
                     {!isListening && (
@@ -413,9 +421,14 @@ Region: ${locationData.address.region || 'Unknown'}
                             Try saying "What's the weather?" or "Show my crops"
                         </Text>
                     )}
-                    {/* <Message /> */}
-                </View>
+                     
 
+                    </View>
+
+                </View>
+                {/* message section */}
+                <Message />
+                  {/* this is now the scrollable section which shows weather and trending activity */}
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#4CAF50']} />}

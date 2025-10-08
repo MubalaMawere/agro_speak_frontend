@@ -185,7 +185,7 @@ export  const  styles = {
     sectionTitle: {
         fontSize: getResponsiveValue(18, 20, 22),
         fontWeight: 'bold',
-        color: '#ffffffff',
+        color: '#00ae0cff',
     },
 
     seeAllButton: {

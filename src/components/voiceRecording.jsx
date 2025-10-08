@@ -138,12 +138,13 @@ export default function VoiceRecording() {
 const s = StyleSheet.create({
   wrapper: { alignItems: 'center', gap: 12 },
   micCircle: {
-    width: 130,
-    height: 130,
+    width: 110,
+    height: 110,
     borderRadius: 65,
     backgroundColor: '#0fb400ff',
     alignItems: 'center',
     justifyContent: 'center',
+   
   },
   wave: { height: 4, borderRadius: 2, backgroundColor: 'red', marginTop: 10 },
 
@@ -151,13 +152,13 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    marginTop: 10,
+    marginTop: 7,
     width: 320,
     justifyContent: 'space-around',
     backgroundColor: '#ffff',
     borderRadius: 8,
     opacity: .7,
-
+marginBottom:50,
   },
 
   controlBtn: { padding: 6 },
