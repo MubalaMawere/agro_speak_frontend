@@ -9,7 +9,10 @@ import {
     Dimensions,
     RefreshControl,
     Alert,
-    Keyboard, Image, Button,
+    Keyboard,
+     Image,
+      Button,
+      Pressable
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
@@ -33,6 +36,7 @@ const HomeScreen = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState('Home');
     const [profileVisible, setProfileVisible] = useState(false);
     const [weatherModalVisible, setWeatherModalVisible] = useState(false);
+    const [activeButton, setActiveButton] = useState(null);
     //const [recordingOn, setRecordingOn] = useState(false);
     // Location hook with auto-start
     const {
@@ -327,7 +331,13 @@ Region: ${locationData.address.region || 'Unknown'}
             </View>
         </TouchableOpacity>
     );
-
+ 
+ const buttons = [
+    { id: 0, label: 'weather', icon: 'cloudy-outline', activeIcon: 'cloudy' },
+    { id: 1, label: 'trending', icon: 'globe-outline', activeIcon: 'globe' },
+    { id: 2, label: 'insite', icon: 'analytics-outline', activeIcon: 'analytics' },
+    { id: 3, label: 'favourite', icon: 'heart-outline', activeIcon: 'heart' },
+  ];
     return (
         <SafeAreaProvider>
             <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -428,6 +438,34 @@ Region: ${locationData.address.region || 'Unknown'}
                 </View>
                 {/* message section */}
                 <Message />
+                {/* button for different quick access */}
+                <View style={styles.siteNavContainer}>
+                     {buttons.map((btn) => {
+        const isActive = activeButton === btn.id;
+        return (
+          <Pressable
+            key={btn.id}
+            onPress={() => setActiveButton(btn.id)}
+            style={({ pressed }) => [
+              styles.button,
+              isActive && styles.activeButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Ionicons
+              name={isActive ? btn.activeIcon : btn.icon}
+              size={24}
+              color={isActive ? '#2ab400ff' : '#a8a8a8ff'}
+            />
+            <Text style={[{color:'#a8a8a8ff'}, isActive && {color:'#2ab400ff'}]}>
+              {btn.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+      
+                    
+                </View>
                   {/* this is now the scrollable section which shows weather and trending activity */}
                 <ScrollView
                     showsVerticalScrollIndicator={false}
@@ -436,13 +474,7 @@ Region: ${locationData.address.region || 'Unknown'}
 
                     {/* Quick Info Cards */}
                     <View style={styles.cardsSection}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>Quick Overview</Text>
-                            <TouchableOpacity style={styles.seeAllButton} activeOpacity={0.7} onPress={() => { alert("this feature is coming soon") }}>
-                                <Text style={styles.seeAllText}>See All</Text>
-                            </TouchableOpacity>
-                        </View>
-
+                    
                         <View style={styles.cardsGrid}>
                             <View style={styles.cardRow}>
                                 <WeatherCard />

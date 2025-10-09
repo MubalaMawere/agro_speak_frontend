@@ -450,4 +450,19 @@ export  const  styles = {
         fontWeight: 'bold',
         color: '#2C3E50',
     },
+    siteNavContainer:{
+    width:width*.9,
+  
+    
+    display:'flex',
+    flexDirection:'row',
+    justifyContent:'space-around',
+    alignSelf:'center',
+
+},
+button:{
+    display:'flex',
+    alignItems:'center',
+    padding:6,
+},
 };
