@@ -102,8 +102,20 @@ export  const  styles = {
     voiceSection: {
         paddingHorizontal: 20,
         paddingVertical: getResponsiveValue(20, 25, 30),
-        alignItems: 'center',
+        alignItems:'center',
+        height:height*.3,
+        backgroundColor:'red',
+          overflow:'hidden',
+         borderBottomLeftRadius: 50,
       
+    },
+    bg_image: {
+        width: width,
+        
+         position: 'absolute',
+         
+       
+        zIndex:0,
     },
 
     voiceButton: {
@@ -173,7 +185,7 @@ export  const  styles = {
     sectionTitle: {
         fontSize: getResponsiveValue(18, 20, 22),
         fontWeight: 'bold',
-        color: '#ffffffff',
+        color: '#00ae0cff',
     },
 
     seeAllButton: {
@@ -438,4 +450,19 @@ export  const  styles = {
         fontWeight: 'bold',
         color: '#2C3E50',
     },
+    siteNavContainer:{
+    width:width*.9,
+  
+    
+    display:'flex',
+    flexDirection:'row',
+    justifyContent:'space-around',
+    alignSelf:'center',
+
+},
+button:{
+    display:'flex',
+    alignItems:'center',
+    padding:6,
+},
 };

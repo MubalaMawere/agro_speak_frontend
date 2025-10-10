@@ -9,31 +9,35 @@ import {
     Dimensions,
     RefreshControl,
     Alert,
-    Keyboard,Image,Button,
+    Keyboard,
+     Image,
+      Button,
+      Pressable
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { Ionicons } from '@expo/vector-icons';
-import {styles,getResponsiveValue} from "./Styles";
+import { styles, getResponsiveValue } from "./Styles";
 import ProfileScreen from '../Profile';
 import useLocation from '../../hooks/useLocation';
 
-import  useWeather  from '../../hooks/useWeather';
+import useWeather from '../../hooks/useWeather';
 import WeatherDisplay from '../../components/WeatherDisplay';
 import farmer2 from '../../../assets/farmer2.jpg';
 import VoiceRecording from '../../components/voiceRecording';
-
+import Message from '../../components/message';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
 const HomeScreen = ({ navigation }) => {
-  
+
     const [isListening, setIsListening] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [activeTab, setActiveTab] = useState('Home');
     const [profileVisible, setProfileVisible] = useState(false);
     const [weatherModalVisible, setWeatherModalVisible] = useState(false);
-     const[recordingOn,setRecordingOn]=useState(false);
+    const [activeButton, setActiveButton] = useState(null);
+    //const [recordingOn, setRecordingOn] = useState(false);
     // Location hook with auto-start
     const {
         location,
@@ -135,22 +139,15 @@ const HomeScreen = ({ navigation }) => {
         }
     }, [isListening]);
 
-const handleRecording=(status)=>{
-    setStartRecord(!startRecord);
-    if(status==true){
-        VoiceRecording(status);
-    }else{
-        VoiceRecording(status);
-    }
-    
-}
+
+
     const handleVoicePress = async () => {
         setIsListening(!isListening);
         if (!isListening) {
             // Test location data when voice is pressed
             try {
                 const locationData = await getCurrentLocation();
-                
+
                 const locationInfo = `
 📍 LOCATION FOUND!
 Coordinates: ${locationData.latitude.toFixed(6)}, ${locationData.longitude.toFixed(6)}
@@ -218,10 +215,10 @@ Region: ${locationData.address.region || 'Unknown'}
                     ) : weatherLoading ? (
                         <Ionicons name="sync" size={getResponsiveValue(32, 36, 40)} color="#4A90E2" />
                     ) : hasCurrentWeather ? (
-                        <Ionicons 
-                            name={current?.icon === 'sunny' ? 'sunny' : current?.icon === 'rainy' ? 'rainy' : 'cloudy'} 
-                            size={getResponsiveValue(32, 36, 40)} 
-                            color={current?.icon === 'sunny' ? '#FFD700' : current?.icon === 'rainy' ? '#4A90E2' : '#95A5A6'} 
+                        <Ionicons
+                            name={current?.icon === 'sunny' ? 'sunny' : current?.icon === 'rainy' ? 'rainy' : 'cloudy'}
+                            size={getResponsiveValue(32, 36, 40)}
+                            color={current?.icon === 'sunny' ? '#FFD700' : current?.icon === 'rainy' ? '#4A90E2' : '#95A5A6'}
                         />
                     ) : weatherError ? (
                         <Ionicons name="cloud-offline" size={getResponsiveValue(32, 36, 40)} color="#f44336" />
@@ -238,11 +235,11 @@ Region: ${locationData.address.region || 'Unknown'}
                     {hasCurrentWeather ? current.condition : locationLoading ? 'Getting location...' : weatherLoading ? 'Loading weather...' : 'Tap to get weather'}
                 </Text>
                 <Text style={styles.weatherLocation}>
-                    {locationLoading ? 'Getting location...' : 
-                     address ? (address.city || address.district || address.subregion || address.region || 'Unknown location') : 
-                     'Tap to get location'}
+                    {locationLoading ? 'Getting location...' :
+                        address ? (address.city || address.district || address.subregion || address.region || 'Unknown location') :
+                            'Tap to get location'}
                 </Text>
-                
+
                 {/* Status indicators */}
                 {weatherLoading && (
                     <Text style={[styles.weatherLocation, { color: '#4A90E2', fontSize: 10 }]}>
@@ -326,7 +323,7 @@ Region: ${locationData.address.region || 'Unknown'}
             </Text>
             <View style={styles.newsAlert}>
                 <Text style={styles.newsAlertText}>
-                    {hasCurrentWeather 
+                    {hasCurrentWeather
                         ? `Current: ${current.temperature}°C ${current.condition}`
                         : 'Heavy rains expected this weekend'
                     }
@@ -334,7 +331,13 @@ Region: ${locationData.address.region || 'Unknown'}
             </View>
         </TouchableOpacity>
     );
-
+ 
+ const buttons = [
+    { id: 0, label: 'weather', icon: 'cloudy-outline', activeIcon: 'cloudy' },
+    { id: 1, label: 'trending', icon: 'globe-outline', activeIcon: 'globe' },
+    { id: 2, label: 'insite', icon: 'analytics-outline', activeIcon: 'analytics' },
+    { id: 3, label: 'favourite', icon: 'heart-outline', activeIcon: 'heart' },
+  ];
     return (
         <SafeAreaProvider>
             <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -352,14 +355,14 @@ Region: ${locationData.address.region || 'Unknown'}
                             {/*<Text style={styles.logoText}>AGRO SPEAK</Text>*/}
                         </View>
                         <View style={styles.headerIcons}>
-                            <TouchableOpacity 
-                                style={styles.headerIconButton} 
-                                activeOpacity={0.7} 
+                            <TouchableOpacity
+                                style={styles.headerIconButton}
+                                activeOpacity={0.7}
                                 onPress={async () => {
                                     try {
                                         await getCurrentLocation();
                                         Alert.alert(
-                                            'Current Location', 
+                                            'Current Location',
                                             address ? address.formattedAddress : 'Location retrieved successfully'
                                         );
                                     } catch (error) {
@@ -367,20 +370,20 @@ Region: ${locationData.address.region || 'Unknown'}
                                     }
                                 }}
                             >
-                                <Ionicons 
-                                    name={locationLoading ? "location" : isLocationAvailable ? "location" : "location-outline"} 
-                                    size={getResponsiveValue(20, 22, 24)} 
-                                    color={isLocationAvailable ? "#4CAF50" : "#666"} 
+                                <Ionicons
+                                    name={locationLoading ? "location" : isLocationAvailable ? "location" : "location-outline"}
+                                    size={getResponsiveValue(20, 22, 24)}
+                                    color={isLocationAvailable ? "#4CAF50" : "#666"}
                                 />
                             </TouchableOpacity>
-                            <TouchableOpacity 
-                                style={styles.headerIconButton} 
-                                activeOpacity={0.7} 
+                            <TouchableOpacity
+                                style={styles.headerIconButton}
+                                activeOpacity={0.7}
                                 onPress={() => navigation.navigate('WeatherTest')}
                             >
                                 <Ionicons name="cloudy-outline" size={getResponsiveValue(20, 22, 24)} color="#4A90E2" />
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.7} onPress={()=>{alert("notifications features  coming soon")}}>
+                            <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.7} onPress={() => { alert("notifications features  coming soon") }}>
                                 <Ionicons name="notifications-outline" size={getResponsiveValue(20, 22, 24)} color="#666" />
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.7} onPress={() => {
@@ -397,90 +400,81 @@ Region: ${locationData.address.region || 'Unknown'}
                     {/*</View>*/}
                 </View>
 
+
+                {/* Voice Assistant Section  or the top section*/}
+                <View style={styles.voiceSection}>
+
+                    <Image
+                        source={farmer2}
+                        style={styles.bg_image}
+                    />
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+
+                        <VoiceRecording />
+
+
+                    </View>
+                    <View style={{
+                        width:screenWidth*1,
+                        height:60,
+                        backgroundColor:'transparent',
+                        position:'absolute',
+                        bottom:0,
+                        
+
+                    }}>
+                  <Text style={[styles.voiceStatusText, isListening && styles.voiceStatusActive, {marginTop:8}]}>
+                        {isListening ? "I'm listening..." : "Voice Assistant Ready"}
+                    </Text>
+                    {!isListening && (
+                        <Text style={styles.voiceHintText}>
+                            Try saying "What's the weather?" or "Show my crops"
+                        </Text>
+                    )}
+                     
+
+                    </View>
+
+                </View>
+                {/* message section */}
+                <Message />
+                {/* button for different quick access */}
+                <View style={styles.siteNavContainer}>
+                     {buttons.map((btn) => {
+        const isActive = activeButton === btn.id;
+        return (
+          <Pressable
+            key={btn.id}
+            onPress={() => setActiveButton(btn.id)}
+            style={({ pressed }) => [
+              styles.button,
+              isActive && styles.activeButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Ionicons
+              name={isActive ? btn.activeIcon : btn.icon}
+              size={24}
+              color={isActive ? '#2ab400ff' : '#a8a8a8ff'}
+            />
+            <Text style={[{color:'#a8a8a8ff'}, isActive && {color:'#2ab400ff'}]}>
+              {btn.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+      
+                    
+                </View>
+                  {/* this is now the scrollable section which shows weather and trending activity */}
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#4CAF50']} />}
                 >
-                    {/* Voice Assistant Section  or the top section*/}
-                    <View style={styles.voiceSection}>
-                    
-                    <Image
-                    source={farmer2}
-                    style={{width:screenWidth*1, 
-                        height:screenHeight*.4,
-                        position:'absolute',
-                         resizeMode:'contain',
-                        top:0, 
-                        borderBottomLeftRadius:50,
-                        }}
-                    />
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <VoiceRecording />
-
-      
-    </View>
-                        {/* <TouchableOpacity style={[styles.voiceButton, isListening && styles.voiceButtonActive]} onPress={()=>handleRecording(startRecord)} activeOpacity={0.8}>
-                            {isListening && (
-                                <>
-                                    <Animated.View style={[
-                                        styles.pulseRing,
-                                        {
-                                            width: getResponsiveValue(120, 140, 160),
-                                            height: getResponsiveValue(120, 140, 160),
-                                            transform: [{ scale: pulseRing1 }],
-                                            opacity: pulseRing1.interpolate({
-                                                inputRange: [0.8, 1.3],
-                                                outputRange: [0.7, 0],
-                                            }),
-                                        }
-                                    ]} />
-                                    <Animated.View style={[
-                                        styles.pulseRing,
-                                        {
-                                            width: getResponsiveValue(120, 140, 160),
-                                            height: getResponsiveValue(120, 140, 160),
-                                            transform: [{ scale: pulseRing2 }],
-                                            opacity: pulseRing2.interpolate({
-                                                inputRange: [0.8, 1.3],
-                                                outputRange: [0.7, 0],
-                                            }),
-                                        }
-                                    ]} />
-                                </>
-                            )}
-                            <Animated.View style={[
-                                styles.voiceIconContainer,
-                                { transform: [{ scale: pulseAnim }] }
-                            ]}>
-                                <Ionicons
-                                    name={isListening ? "mic" : "mic-outline"}
-                                    size={getResponsiveValue(40, 48, 56)}
-                                    color="white"
-                                />
-                            </Animated.View>
-                            <Text style={styles.voiceButtonText}>
-                                {isListening ? "Listening..." : "Tap to Speak"}
-                            </Text>
-                        </TouchableOpacity> */}
-                        <Text style={[styles.voiceStatusText, isListening && styles.voiceStatusActive]}>
-                            {isListening ? "I'm listening..." : "Voice Assistant Ready"}
-                        </Text>
-                        {!isListening && (
-                            <Text style={styles.voiceHintText}>
-                                Try saying "What's the weather?" or "Show my crops"
-                            </Text>
-                        )}
-                    </View>
 
                     {/* Quick Info Cards */}
                     <View style={styles.cardsSection}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>Quick Overview</Text>
-                            <TouchableOpacity style={styles.seeAllButton} activeOpacity={0.7} onPress={()=>{alert("this feature is coming soon")}}>
-                                <Text style={styles.seeAllText}>See All</Text>
-                            </TouchableOpacity>
-                        </View>
-
+                    
                         <View style={styles.cardsGrid}>
                             <View style={styles.cardRow}>
                                 <WeatherCard />
@@ -497,7 +491,7 @@ Region: ${locationData.address.region || 'Unknown'}
                     <View style={styles.activitySection}>
                         <View style={styles.sectionHeader}>
                             <Text style={styles.sectionTitle}>Recent Activity</Text>
-                            <TouchableOpacity style={styles.seeAllButton} activeOpacity={0.7} onPress={()=>{alert("coming soon")}}>
+                            <TouchableOpacity style={styles.seeAllButton} activeOpacity={0.7} onPress={() => { alert("coming soon") }}>
                                 <Text style={styles.seeAllText}>View All</Text>
                             </TouchableOpacity>
                         </View>
@@ -518,6 +512,7 @@ Region: ${locationData.address.region || 'Unknown'}
                     </View>
                 </ScrollView>
 
+
                 {/* Bottom Navigation */}
                 <SafeAreaView edges={['bottom']}>
                     <View style={styles.bottomNavigation}>
@@ -526,11 +521,12 @@ Region: ${locationData.address.region || 'Unknown'}
                                 key={item.name}
                                 style={styles.navItem}
                                 onPress={() => {
+        
                                     setActiveTab(item.name);
                                     if (item.name !== 'Home') {
                                         // navigation.navigate(item.name);
-                                        alert( item.name+" page is under development \n\n\t\t\t\t COMING SOON")
-                                    }
+                                        alert(item.name + " page is under development \n\n\t\t\t\t COMING SOON")
+                                        }
                                 }}
                                 activeOpacity={0.7}
                             >
@@ -553,6 +549,7 @@ Region: ${locationData.address.region || 'Unknown'}
                 </SafeAreaView>
             </SafeAreaView>
 
+
             {/* Profile Screen */}
             <ProfileScreen
                 visible={profileVisible}
@@ -570,7 +567,7 @@ Region: ${locationData.address.region || 'Unknown'}
                                 <Ionicons name="close" size={24} color="#2C3E50" />
                             </TouchableOpacity>
                         </View>
-                        <WeatherDisplay 
+                        <WeatherDisplay
                             weather={weather}
                             loading={weatherLoading}
                             error={weatherError}

@@ -11,7 +11,7 @@ import weatherService from '../utils/weatherService';
         const locationToUse = targetLocation || location;
         
         if (!locationToUse || !locationToUse.latitude || !locationToUse.longitude) {
-            setError('Location is required to fetch weather data');
+          //  setError('Location is required to fetch weather data');
             return;
         }
 
@@ -19,13 +19,13 @@ import weatherService from '../utils/weatherService';
         setError(null);
 
         try {
-            console.log('Fetching weather for location:', locationToUse);
+          //  console.log('Fetching weather for location:', locationToUse);
             const weatherData = await weatherService.getWeatherForLocation(locationToUse);
             setWeather(weatherData);
-            console.log('Weather data fetched successfully:', weatherData);
+           // console.log('Weather data fetched successfully:', weatherData);
         } catch (err) {
-            console.error('Error fetching weather:', err);
-            setError(err.message || 'Failed to fetch weather data');
+           // console.error('Error fetching weather:', err);
+           // setError(err.message || 'Failed to fetch weather data');
             setWeather(null);
         } finally {
             setLoading(false);
@@ -37,7 +37,7 @@ import weatherService from '../utils/weatherService';
         const locationToUse = targetLocation || location;
         
         if (!locationToUse || !locationToUse.latitude || !locationToUse.longitude) {
-            setError('Location is required to fetch weather data');
+           // setError('Location is required to fetch weather data');
             return null;
         }
 
@@ -93,7 +93,7 @@ import weatherService from '../utils/weatherService';
             
             return forecast;
         } catch (err) {
-            console.error('Error fetching forecast:', err);
+           // console.error('Error fetching forecast:', err);
            // setError(err.message || 'Failed to fetch forecast data');
             return null;
         } finally {
