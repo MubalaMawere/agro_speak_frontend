@@ -79,10 +79,11 @@ export default function LoginScreen({ navigation }) {
                 Alert.alert('Success', 'Login successful!', [
                     {
                         text: 'OK',
-                        onPress: () => navigation.reset({
-                            index: 0,
-                            routes: [{ name: 'Home' }],
-                        }),
+                        onPress: () => navigation.getParent()?.reset({
+                        index: 0,
+                        routes: [{ name: 'Home' }],
+                        })
+
                     },
                 ]);
             } else {
@@ -190,11 +191,7 @@ export default function LoginScreen({ navigation }) {
                                 <TouchableOpacity
                                     style={[css.submitButton, isLoading && css.submitButtonDisabled]}
                                     //  onPress={handleLogin}
-                                onPress={()=>{navigation.reset({
-                                    index :0,
-                                     routes: [{name:'Home'}]
-
-                                    })
+                                onPress={()=>{navigation.replace("tabsNavigator")
                                     }
                                 }
 
