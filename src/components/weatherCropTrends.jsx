@@ -1,55 +1,49 @@
-import React, { useRef, useMemo, useCallback, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image, Dimensions } from 'react-native';
-import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, Image, Dimensions, Modal, Pressable } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const { width } = Dimensions.get('window');
 
 const WeatherCropTrends = ({ name, picture, details }) => {
-  const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ['50%', '90%'], []);
-  const [open, setOpen] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const handleOpen = useCallback(() => {
-    setOpen(true);
-    bottomSheetRef.current?.expand();
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setOpen(false);
-    bottomSheetRef.current?.close();
-  }, []);
+  const handleOpen = () => setModalVisible(true);
+  const handleClose = () => setModalVisible(false);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      {/* Touchable card */}
       <TouchableOpacity style={styles.container} onPress={handleOpen}>
         <View style={styles.imgContainer}>
-          <Image source={picture} resizeMode='cover' style={styles.img} />
+          <Image source={picture} resizeMode="cover" style={styles.img} />
         </View>
         <View style={styles.detailsContainer}>
           <Text style={styles.title}>{name}</Text>
-          <Text numberOfLines={1} ellipsizeMode='tail' style={styles.details}>
+          <Text numberOfLines={1} ellipsizeMode="tail" style={styles.details}>
             {details}
           </Text>
         </View>
       </TouchableOpacity>
 
-      {open && (
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={1}
-          snapPoints={snapPoints}
-          enablePanDownToClose
-          onClose={handleClose}
-          backgroundStyle={{ backgroundColor: '#fff' }}
-        >
-          <BottomSheetScrollView contentContainerStyle={styles.sheetContent}>
-            <Image source={picture} resizeMode='cover' style={styles.bigImage} />
+      {/* Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={handleClose}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContent}>
+            <Image source={picture} resizeMode="cover" style={styles.bigImage} />
             <Text style={styles.sheetTitle}>{name}</Text>
             <Text style={styles.sheetDetails}>{details}</Text>
-          </BottomSheetScrollView>
-        </BottomSheet>
-      )}
+
+            <Pressable style={styles.closeButton} onPress={handleClose}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </GestureHandlerRootView>
   );
 };
@@ -89,7 +83,16 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 12,
   },
-  sheetContent: {
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
     padding: 16,
     alignItems: 'center',
   },
@@ -109,5 +112,17 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#444',
     lineHeight: 22,
+    textAlign: 'center',
+  },
+  closeButton: {
+    marginTop: 16,
+    backgroundColor: 'rgba(1, 99, 1, 1)',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 });
