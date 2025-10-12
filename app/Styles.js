@@ -257,7 +257,9 @@ export  const  styles = {
 
     // Weather Card Specific
     weatherCard: {
-        backgroundColor: '#2196F3',
+       backgroundColor: '#2196F3',
+        
+        
     },
 
     weatherCardContent: {
@@ -350,7 +352,8 @@ export  const  styles = {
     },
 
     activityContent: {
-        flex: 1,
+       flex: 1,
+       
     },
 
     activityText: {
@@ -365,20 +368,7 @@ export  const  styles = {
         color: '#666',
     },
 
-    // Bottom Navigation
-    bottomNavigation: {
-        backgroundColor: 'white',
-        flexDirection: 'row',
-        paddingVertical: getResponsiveValue(8, 10, 12),
-        paddingBottom: getResponsiveValue(20, 25, 30),
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 8,
-        borderTopWidth: 1,
-        borderTopColor: '#f0f0f0',
-    },
+ 
 
     navItem: {
         flex: 1,
@@ -465,4 +455,30 @@ button:{
     alignItems:'center',
     padding:6,
 },
+weatherContainer:{
+
+display:'flex',
+flexDirection:'row',
+justifyContent:'space-around',
+width:width*1,
+height:height* .43,
+gap:10,
+alignItems:'center',
+justifyContent:'center',
+overflow:'hiddeen',
+},
+weartherCardContainer:{
+    width:width*.46,
+    height:height*.27,
+   
+
+},
+weatherActivity:{
+    width:width*.46,
+  height:height *.37,
+    backgroundColor:'#fff', 
+    borderRadius:10,
+},
+
+
 };

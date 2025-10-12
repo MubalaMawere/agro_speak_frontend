@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { getResponsiveValue } from '../Home/Styles';
+import { getResponsiveValue } from '../../../app/Styles';
 import { authStorage } from '../../utils/authStorage';
 import { getApiUrl, API_BASE_URL, API_ENDPOINTS } from '../../config/api';
 import { handleApiError } from '../../utils/errorHandler';

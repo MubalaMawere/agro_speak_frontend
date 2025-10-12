@@ -10,26 +10,28 @@ import {
     RefreshControl,
     Alert,
     Keyboard,
-     Image,
-      Button,
-      Pressable
+    Image,
+    Button,
+    Pressable,
+    FlatList
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { Ionicons } from '@expo/vector-icons';
-import { styles, getResponsiveValue } from "./Styles";
-import ProfileScreen from '../Profile';
-import useLocation from '../../hooks/useLocation';
-
-import useWeather from '../../hooks/useWeather';
-import WeatherDisplay from '../../components/WeatherDisplay';
-import farmer2 from '../../../assets/farmer2.jpg';
-import VoiceRecording from '../../components/voiceRecording';
-import Message from '../../components/message';
+import { styles, getResponsiveValue } from '../Styles';
+import ProfileScreen from '../../src/screens/Profile';
+import useLocation from '../../src/hooks/useLocation';
+import WeatherCropTrends from '../../src/components/weatherCropTrends';
+import useWeather from '../../src/hooks/useWeather';
+import WeatherDisplay from '../../src/components/WeatherDisplay';
+import farmer2 from '../../assets/farmer2.jpg';
+import VoiceRecording from '../../src/components/voiceRecording';
+import Message from '../../src/components/message';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation }) =>{
 
     const [isListening, setIsListening] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
@@ -37,7 +39,7 @@ const HomeScreen = ({ navigation }) => {
     const [profileVisible, setProfileVisible] = useState(false);
     const [weatherModalVisible, setWeatherModalVisible] = useState(false);
     const [activeButton, setActiveButton] = useState(null);
-    //const [recordingOn, setRecordingOn] = useState(false);
+    const [selected, setSelected] = useState('weather')
     // Location hook with auto-start
     const {
         location,
@@ -139,7 +141,43 @@ const HomeScreen = ({ navigation }) => {
         }
     }, [isListening]);
 
-
+const data = [
+    {
+      id: 1,
+      name: 'Matenda',
+      picture: require('../../assets/tomatoPlant.jpg'),
+      details:
+        'Tomatoes are prone to early blight, a fungal disease causing dark spots on leaves and fruit rot.',
+    },
+    {
+      id: 2,
+      name: 'Tuzilombo',
+      picture: require('../../assets/bugsPlant.jpg'),
+      details:
+        'Maize can suffer from maize streak virus, which leads to yellow streaks on leaves and reduced yields.',
+    },
+    {
+      id: 3,
+      name: 'Kuyeza',
+      picture: require('../../assets/women.jpg'),
+      details:
+        'Cassava mosaic disease causes mosaic patterns on leaves and stunted plant growth due to viral infection.',
+    },
+    {
+      id: 4,
+      name: 'Zofufuza',
+      picture: require('../../assets/searchPlant.jpg'),
+      details:
+        'Groundnuts may develop leaf spot disease, which leads to premature leaf drop and poor pod development.',
+    },
+    {
+      id: 5,
+      name: 'Zamaphunzilo',
+      picture: require('../../assets/learnPlant.jpg'),
+      details:
+        'Anthracnose is a common disease in sorghum that causes leaf lesions and weakens plant stems.',
+    },
+  ];
 
     const handleVoicePress = async () => {
         setIsListening(!isListening);
@@ -331,14 +369,15 @@ Region: ${locationData.address.region || 'Unknown'}
             </View>
         </TouchableOpacity>
     );
- 
- const buttons = [
-    { id: 0, label: 'weather', icon: 'cloudy-outline', activeIcon: 'cloudy' },
-    { id: 1, label: 'trending', icon: 'globe-outline', activeIcon: 'globe' },
-    { id: 2, label: 'insite', icon: 'analytics-outline', activeIcon: 'analytics' },
-    { id: 3, label: 'favourite', icon: 'heart-outline', activeIcon: 'heart' },
-  ];
+
+    const buttons = [
+        { id: 0, label: 'weather', icon: 'cloudy-outline', activeIcon: 'cloudy' },
+        { id: 1, label: 'trending', icon: 'globe-outline', activeIcon: 'globe' },
+        { id: 2, label: 'insite', icon: 'analytics-outline', activeIcon: 'analytics' },
+        { id: 3, label: 'favourite', icon: 'heart-outline', activeIcon: 'heart' },
+    ];
     return (
+        <GestureHandlerRootView>
         <SafeAreaProvider>
             <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
                 <StatusBar backgroundColor="white" barStyle="dark-content" />
@@ -415,64 +454,96 @@ Region: ${locationData.address.region || 'Unknown'}
 
                     </View>
                     <View style={{
-                        width:screenWidth*1,
-                        height:60,
-                        backgroundColor:'transparent',
-                        position:'absolute',
-                        bottom:0,
-                        
+                        width: screenWidth * 1,
+                        height: 60,
+                        backgroundColor: 'transparent',
+                        position: 'absolute',
+                        bottom: 0,
+
 
                     }}>
-                  <Text style={[styles.voiceStatusText, isListening && styles.voiceStatusActive, {marginTop:8}]}>
-                        {isListening ? "I'm listening..." : "Voice Assistant Ready"}
-                    </Text>
-                    {!isListening && (
-                        <Text style={styles.voiceHintText}>
-                            Try saying "What's the weather?" or "Show my crops"
+                        <Text style={[styles.voiceStatusText, isListening && styles.voiceStatusActive, { marginTop: 8 }]}>
+                            {isListening ? "I'm listening..." : "Voice Assistant Ready"}
                         </Text>
-                    )}
-                     
+                        {!isListening && (
+                            <Text style={styles.voiceHintText}>
+                                Try saying "What's the weather?" or "Show my crops"
+                            </Text>
+                        )}
+
 
                     </View>
 
                 </View>
                 {/* message section */}
                 <Message />
+
                 {/* button for different quick access */}
+
                 <View style={styles.siteNavContainer}>
-                     {buttons.map((btn) => {
-        const isActive = activeButton === btn.id;
-        return (
-          <Pressable
-            key={btn.id}
-            onPress={() => setActiveButton(btn.id)}
-            style={({ pressed }) => [
-              styles.button,
-              isActive && styles.activeButton,
-              pressed && styles.pressed,
-            ]}
-          >
-            <Ionicons
-              name={isActive ? btn.activeIcon : btn.icon}
-              size={24}
-              color={isActive ? '#2ab400ff' : '#a8a8a8ff'}
-            />
-            <Text style={[{color:'#a8a8a8ff'}, isActive && {color:'#2ab400ff'}]}>
-              {btn.label}
-            </Text>
-          </Pressable>
-        );
-      })}
-      
-                    
+                    {buttons.map((btn) => {
+                        const isActive = activeButton === btn.id;
+                        return (
+                            <Pressable
+                                key={btn.id}
+                                onPress={() => {
+                                    setActiveButton(btn.id)
+                                    setSelected(btn.label)
+                                }}
+                                style={({ pressed }) => [
+                                    styles.button,
+                                    isActive && styles.activeButton,
+                                    pressed && styles.pressed,
+                                ]}
+                            >
+                                <Ionicons
+                                    name={isActive ? btn.activeIcon : btn.icon}
+                                    size={24}
+                                    color={isActive ? '#2ab400ff' : '#a8a8a8ff'}
+                                />
+                                <Text style={[{ color: '#a8a8a8ff' }, isActive && { color: '#2ab400ff' }]}>
+                                    {btn.label}
+                                </Text>
+                            </Pressable>
+
+                        );
+                    })}
+
+
                 </View>
-                  {/* this is now the scrollable section which shows weather and trending activity */}
-                <ScrollView
+                {selected == 'weather' && (
+
+                    <View style={styles.weatherContainer}>
+                        <View style={styles.weartherCardContainer}>
+
+                            <WeatherCard />
+                        </View>
+                        <View style={styles.weatherActivity}>
+                            <FlatList 
+                            data={data}
+                             renderItem={({item}) =>  <WeatherCropTrends 
+                             name={item.name}
+                            picture={item.picture}
+                            details={item.details}
+                           
+                             
+                             
+                             />}
+                              keyExtractor={item => item.id}
+                            />
+                             
+                        </View>
+
+                    </View>
+                )}
+
+
+                {/* <ScrollView
                     showsVerticalScrollIndicator={false}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#4CAF50']} />}
                 >
 
-                    {/* Quick Info Cards */}
+                    
                     <View style={styles.cardsSection}>
                     
                         <View style={styles.cardsGrid}>
@@ -487,7 +558,7 @@ Region: ${locationData.address.region || 'Unknown'}
                         </View>
                     </View>
 
-                    {/* Recent Activity */}
+                    
                     <View style={styles.activitySection}>
                         <View style={styles.sectionHeader}>
                             <Text style={styles.sectionTitle}>Recent Activity</Text>
@@ -510,76 +581,44 @@ Region: ${locationData.address.region || 'Unknown'}
                             ))}
                         </View>
                     </View>
-                </ScrollView>
+                </ScrollView> */}
 
 
-                {/* Bottom Navigation */}
-                <SafeAreaView edges={['bottom']}>
-                    <View style={styles.bottomNavigation}>
-                        {navigationItems.map((item) => (
-                            <TouchableOpacity
-                                key={item.name}
-                                style={styles.navItem}
-                                onPress={() => {
-        
-                                    setActiveTab(item.name);
-                                    if (item.name !== 'Home') {
-                                        // navigation.navigate(item.name);
-                                        alert(item.name + " page is under development \n\n\t\t\t\t COMING SOON")
-                                        }
-                                }}
-                                activeOpacity={0.7}
-                            >
-                                <View style={styles.navIcon}>
-                                    <Ionicons
-                                        name={activeTab === item.name ? item.icon : `${item.icon}-outline`}
-                                        size={getResponsiveValue(22, 24, 26)}
-                                        color={activeTab === item.name ? '#4CAF50' : '#666'}
-                                    />
-                                </View>
-                                <Text style={[
-                                    styles.navLabel,
-                                    activeTab === item.name && styles.navLabelActive
-                                ]}>
-                                    {item.label}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </SafeAreaView>
-            </SafeAreaView>
+              
+            </SafeAreaView> 
 
 
-            {/* Profile Screen */}
-            <ProfileScreen
-                visible={profileVisible}
-                onClose={() => setProfileVisible(false)}
-                navigation={navigation}
-            />
+                {/* Profile Screen */}
+                {/* <ProfileScreen
+                    visible={profileVisible}
+                    onClose={() => setProfileVisible(false)}
+                    navigation={navigation}
+                /> */}
 
-            {/* Weather Details Modal */}
-            {weatherModalVisible && (
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>Weather Details</Text>
-                            <TouchableOpacity onPress={() => setWeatherModalVisible(false)}>
-                                <Ionicons name="close" size={24} color="#2C3E50" />
-                            </TouchableOpacity>
+                {/* Weather Details Modal */}
+                {/* {weatherModalVisible && (
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContainer}>
+                            <View style={styles.modalHeader}>
+                                <Text style={styles.modalTitle}>Weather Details</Text>
+                                <TouchableOpacity onPress={() => setWeatherModalVisible(false)}>
+                                    <Ionicons name="close" size={24} color="#2C3E50" />
+                                </TouchableOpacity>
+                            </View>
+                            <WeatherDisplay
+                                weather={weather}
+                                loading={weatherLoading}
+                                error={weatherError}
+                                onRefresh={refreshWeather}
+                                showForecast={true}
+                                showSoil={true}
+                                compact={false}
+                            />
                         </View>
-                        <WeatherDisplay
-                            weather={weather}
-                            loading={weatherLoading}
-                            error={weatherError}
-                            onRefresh={refreshWeather}
-                            showForecast={true}
-                            showSoil={true}
-                            compact={false}
-                        />
                     </View>
-                </View>
-            )}
+                )} */}
         </SafeAreaProvider>
+        </GestureHandlerRootView>
     );
 };
 
