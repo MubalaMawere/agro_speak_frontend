@@ -13,12 +13,13 @@ import * as FileSystem from "expo-file-system";
 
 const MODEL = "espnet/kan-bayashi_ljspeech_vits"; 
 
+
 const Swidth = Dimensions.get('window').width;
 
 const ResultsScreen = ({ route }) => {
   const { audioUri, userId,text, from } = route.params;
   const navigation = useNavigation();
- 
+ //const the key goes here
   const player = useAudioPlayer(audioUri ? { uri: audioUri } : null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
