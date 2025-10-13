@@ -5,8 +5,27 @@ const screenWidth = Dimensions.get('window').width;
 const screeHeight = Dimensions.get('window').height;
 
 const Message = () => {
+ 
   const [text,setText]=useState('')
 
+  //sending a message
+const sendeMessage= async()=>{
+
+ try {
+
+if((text.trim()).length <=2){
+ // error.Message('message length too small')
+  console.log('message length must be atleast 3 characters long')
+}else{
+
+  console.log('the message is ====>',text)
+}
+
+  //sending a message request
+} catch (error) {
+  //catching errors
+}
+}
   return (
     <View style={styles.container}>
       <TextInput 
@@ -15,12 +34,14 @@ const Message = () => {
       style={styles.msg}
       placeholder='Write a search message'
       />
+      <TouchableOpacity onPress={sendeMessage}>
       <Ionicons 
       name='send'
       size={28}
       color={'green'}
       
       />
+      </TouchableOpacity>
     </View>
   )
 }

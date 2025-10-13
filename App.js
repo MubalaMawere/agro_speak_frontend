@@ -13,7 +13,8 @@ import OnboardingScreens from './src/screens/Splash/Onboard';
 import LoginScreen from './src/screens/Auth/LoginScreen';
 import RegisterScreen from './src/screens/Auth/RegisterScreen';
 import WeatherTestScreen from './src/screens/WeatherTestScreen';
-
+import VoiceRecording from './src/components/voiceRecording';
+import ResultsScreen from './src/screens/resultsScreen'
 // Tabs navigator
 import TabsNavigator from './app/(tabs)/tabsNavigator';
 
@@ -66,6 +67,8 @@ export default function App() {
         {/* Replace HomeScreen with TabsNavigator */}
         <Stack.Screen name="tabsNavigator" component={TabsNavigator} options={{ animation: 'fade' }} />
         <Stack.Screen name="WeatherTest" component={WeatherTestScreen} options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="voiceRecording" component={VoiceRecording} options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="resultsScreen" component={ResultsScreen} options={{ animation: 'slide_from_right' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
