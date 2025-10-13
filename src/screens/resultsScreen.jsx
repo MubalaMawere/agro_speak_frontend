@@ -18,7 +18,7 @@ const Swidth = Dimensions.get('window').width;
 const ResultsScreen = ({ route }) => {
   const { audioUri, userId,text, from } = route.params;
   const navigation = useNavigation();
-  const token  = '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'
+ 
   const player = useAudioPlayer(audioUri ? { uri: audioUri } : null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +71,7 @@ const [isReading,setReading]=useState(false)
 
 
 const speak=async (text) =>{
-  const HUGGINGFACE_API_KEY = "YOUR_HUGGINGFACE_API_KEY"; // Replace with your key
+ 
 
 
   try {
