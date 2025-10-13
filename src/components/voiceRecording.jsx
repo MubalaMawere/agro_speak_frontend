@@ -113,7 +113,7 @@ export default function VoiceRecording() {
     }
     setRecordingUri(null);
   };
-const userText = 'I’m a passionate logo designer and web & app developer who blends creativity with technology to craft impactful digital experiences. With a strong eye for branding and modern design trends, I help businesses stand out through powerful visuals, seamless user interfaces, and smart digital solutions. My mission is to turn ideas into brands and brands into experiences.'
+const userText = 'I’m a passionate logo designer '
   const sendAudionRequest=()=>{
 
     console.log("Recorded audio ====>",recordingUri)
