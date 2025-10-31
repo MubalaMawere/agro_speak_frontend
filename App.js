@@ -15,6 +15,12 @@ import RegisterScreen from './src/screens/Auth/RegisterScreen';
 import WeatherTestScreen from './src/screens/WeatherTestScreen';
 import VoiceRecording from './src/components/voiceRecording';
 import ResultsScreen from './src/screens/resultsScreen'
+import ConnectionDashboard from './src/screens/ConnectionDashboard';
+import ChatScreen from './src/screens/ChatScreen';
+import ProfileScreen from './src/screens/Profile';
+import VoiceTranscriptionScreen from './src/screens/VoiceTranscriptionScreen';
+
+
 // Tabs navigator
 import TabsNavigator from './app/(tabs)/tabsNavigator';
 

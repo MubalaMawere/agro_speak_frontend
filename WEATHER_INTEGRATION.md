@@ -246,3 +246,128 @@ The system includes comprehensive error handling:
 3. Verify backend endpoint responses
 4. Use WeatherTestScreen for systematic testing
 5. Check console logs for detailed error messages
+
+
+
+# Backend Integration Guide
+
+## Overview
+backend integration points for the Connections Dashboard feature.
+
+## API Endpoints Required
+
+### 1. Connections Dashboard
+- **GET /api/connections/dashboard** - Get counts for buyers, cooperatives, suppliers
+- **GET /api/connections/buyers** - Get list of buyers with search/filter
+- **GET /api/connections/cooperatives** - Get list of cooperatives with search/filter  
+- **GET /api/connections/suppliers** - Get list of suppliers with search/filter
+
+### 2. Profile Details
+- **GET /api/connections/{type}/{id}** - Get detailed profile information
+- **POST /api/connections/connect** - Connect with buyer/supplier
+- **POST /api/connections/join** - Join cooperative
+
+### 3. Chat System
+- **GET /api/chat/conversations/{contactId}** - Get conversation history
+- **POST /api/chat/messages** - Send text message
+- **POST /api/chat/voice-messages** - Send voice message
+- **GET /api/chat/voice-messages/{messageId}/play** - Get voice message audio
+
+### 4. Voice Assistant Integration
+- **POST /api/voice/transcribe** - Transcribe voice input
+- **POST /api/voice/process-command** - Process voice commands for connections
+
+## Data Models
+
+### Buyer/Supplier Profile
+```json
+{
+  "id": "string",
+  "businessName": "string",
+  "fullName": "string", 
+  "phone": "string",
+  "email": "string",
+  "location": "string",
+  "category": "Buyer|Supplier",
+  "rating": "number",
+  "reviews": "number",
+  "established": "string",
+  "description": "string",
+  "services": ["string"],
+  "isConnected": "boolean"
+}
+```
+
+### Cooperative Profile
+```json
+{
+  "id": "string",
+  "name": "string",
+  "location": "string",
+  "category": "Cooperative",
+  "members": "number",
+  "established": "string",
+  "description": "string",
+  "isJoined": "boolean"
+}
+```
+
+### Chat Message
+```json
+{
+  "id": "string",
+  "conversationId": "string",
+  "sender": "user|contact",
+  "text": "string",
+  "type": "text|voice",
+  "audioUri": "string",
+  "timestamp": "datetime"
+}
+```
+
+## Integration Points in Code
+
+### ConnectionsDashboard.js
+- Line 12: Replace SAMPLE_DATA with API calls
+- Line 147: Integrate voice assistant with backend
+- Line 155: Implement filter functionality
+- Line 160: Replace with backend API call
+- Line 172: Replace with backend API call
+
+### ProfileDetails.js  
+- Line 15: Replace with backend API call
+- Line 35: Integrate with phone calling
+- Line 42: Navigate to chat with backend data
+- Line 48: Replace with backend API call
+
+### ChatScreen.js
+- Line 25: Load conversation history from backend
+- Line 40: Send message to backend API
+- Line 60: Send voice message to backend API
+- Line 85: Play voice messages from backend
+
+## Authentication
+All API calls should include authentication headers:
+```
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+## Error Handling
+Implement proper error handling for:
+- Network connectivity issues
+- Authentication failures
+- API rate limiting
+- Voice recording/playback errors
+
+## Real-time Features
+Consider implementing WebSocket connections for:
+- Real-time chat messages
+- Connection status updates
+- Voice message notifications
+
+## File Upload
+For voice messages, implement file upload to cloud storage:
+- AWS S3, Google Cloud Storage, or Azure Blob Storage
+- Generate signed URLs for audio playback
+- Handle file cleanup and expiration
