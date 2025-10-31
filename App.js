@@ -8,6 +8,7 @@ import * as Audio from 'expo-av';
 import { Camera } from 'expo-camera';
 
 // Screens
+import VoiceAssistantScreen from './src/screens/VoiceAssistant';
 import SplashScreen from './src/screens/Splash/SplashScreen';
 import OnboardingScreens from './src/screens/Splash/Onboard';
 import LoginScreen from './src/screens/Auth/LoginScreen';
@@ -69,6 +70,16 @@ export default function App() {
         <Stack.Screen name="WeatherTest" component={WeatherTestScreen} options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="voiceRecording" component={VoiceRecording} options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="resultsScreen" component={ResultsScreen} options={{ animation: 'slide_from_right' }} />
+        
+        <Stack.Screen 
+  name="VoiceAssistant" 
+  component={VoiceAssistantScreen}
+  options={{ 
+    headerShown: false,
+    title: 'Voice Assistant'
+  }}
+/>
+
       </Stack.Navigator>
     </NavigationContainer>
   );

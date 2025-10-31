@@ -24,6 +24,7 @@
     "expo-camera": "~17.0.8",
     "expo-location": "^19.0.7",
     "expo-media-library": "~18.2.0",
+    "expo-speech": "^14.0.7",
     "expo-splash-screen": "~31.0.10",
     "expo-status-bar": "~3.0.8",
     "react": "19.1.0",
@@ -35,5 +36,8 @@
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@gradio/client": "^2.0.0-dev.1"
+  }
 }
