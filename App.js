@@ -18,7 +18,7 @@ import VoiceRecording from './src/components/voiceRecording';
 import ResultsScreen from './src/screens/resultsScreen'
 import ConnectionDashboard from './src/screens/ConnectionDashboard';
 import ChatScreen from './src/screens/ChatScreen';
-import ProfileScreen from './src/screens/Profile';
+import ProfileDetails from './src/screens/Profile';
 import VoiceTranscriptionScreen from './src/screens/VoiceTranscriptionScreen';
 
 
@@ -71,11 +71,19 @@ export default function App() {
         <Stack.Screen name="Onboard" component={OnboardingScreens} options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="Register" component={RegisterScreen} options={{ animation: 'slide_from_right' }} />
+        
         {/* Replace HomeScreen with TabsNavigator */}
+        
         <Stack.Screen name="tabsNavigator" component={TabsNavigator} options={{ animation: 'fade' }} />
+        
         <Stack.Screen name="WeatherTest" component={WeatherTestScreen} options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="voiceRecording" component={VoiceRecording} options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="resultsScreen" component={ResultsScreen} options={{ animation: 'slide_from_right' }} />
+          
+        <Stack.Screen name="Connections" component={ConnectionDashboard} />
+        <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} />
+        <Stack.Screen name="VoiceTranscription" component={VoiceTranscriptionScreen} />
         
         <Stack.Screen 
   name="VoiceAssistant" 
